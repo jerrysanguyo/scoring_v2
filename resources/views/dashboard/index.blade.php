@@ -1,8 +1,10 @@
-<div class="text-center mt-3">
-    <form action="{{ route(Auth::user()->getRoleNames()->first() . '.logout') }}" method="POST" class="d-inline">
-        @csrf
-        <button type="submit" class="btn btn-danger btn-sm">
-            <i class="fas fa-sign-out-alt mr-1"></i> Logout
-        </button>
-    </form>
-</div>
+@extends('layouts.dashboard')
+@section('content')
+@include('components.alert')
+
+
+
+@endsection
+@push('scripts')
+<script src="{{ asset('assets/js/auth/password.js') }}"></script>
+@endpush

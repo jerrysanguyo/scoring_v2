@@ -1,0 +1,28 @@
+.header {
+    background-image: url('/images/bg.webp');
+    background-size: cover;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    background-position: 50% 82%;
+}
+
+@media (max-width: 576px) {
+    .header {
+        background-position: 50% 88%;
+    }
+}
+
+@media (min-width: 577px) and (max-width: 991.98px) {
+    .header {
+        background-position: 50% 70%;
+    }
+}
+
+@media (min-width: 992px) {
+    .header {
+        background-position: 50% 75%;
+    }
+}
