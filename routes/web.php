@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Cms\CriteriaController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,6 +23,7 @@ Route::middleware('auth')
     ->group(function() {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+        Route::resource('criteria', CriteriaController::class)->middleware('merge_cms:criterias,criteria'); // merge_cms:table_name,resource
     });
 
     Route::middleware('role:admin')

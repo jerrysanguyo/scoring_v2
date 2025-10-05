@@ -13,30 +13,60 @@
             <div id="kt_aside_menu"
                 class="menu menu-column menu-title-gray-600 menu-state-primary menu-state-icon-primary menu-state-bullet-primary menu-icon-gray-400 menu-arrow-gray-400 fw-semibold fs-6 my-auto"
                 data-kt-menu="true">
-                <div data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-placement="right-start"
-                    class="menu-item here show py-2">
-                    <span class="menu-link menu-center">
+                <div class="menu-item py-2">
+                    <a href="{{ route(Auth::user()->getRoleNames()->first() . '.dashboard.index') }}"
+                        class="menu-link menu-center {{ request()->routeIs(Auth::user()->getRoleNames()->first() . '.dashboard.index') ? 'active' : '' }}">
                         <span class="menu-icon me-0">
                             <i class="ki-duotone ki-home-2 fs-2x">
                                 <span class="path1"></span>
                                 <span class="path2"></span>
                             </i>
                         </span>
+                    </a>
+                </div>
+                @php
+                $role = Auth::user()->getRoleNames()->first();
+                $children = [
+                'criteria.index',
+                ];
+
+                $open = collect($children)
+                ->map(fn($r) => "$role.$r")
+                ->contains(fn($route) => request()->routeIs($route));
+                @endphp
+
+                <div data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-placement="right-start"
+                    class="menu-item py-2 {{ $open ? 'show here' : '' }}">
+
+                    <span class="menu-link menu-center {{ $open ? 'active' : '' }}">
+                        <span class="menu-icon me-0">
+                            <i class="ki-duotone ki-verify fs-2x">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                            </i>
+                        </span>
                     </span>
+
                     <div class="menu-sub menu-sub-dropdown px-2 py-4 w-250px mh-75 overflow-auto">
                         <div class="menu-item">
                             <div class="menu-content">
-                                <span class="menu-section fs-5 fw-bolder ps-1 py-1">Home</span>
+                                <span class="menu-section fs-5 fw-bolder ps-1 py-1">CMS</span>
                             </div>
                         </div>
+
                         <div class="menu-item">
-                            <a class="menu-link active" href="../../demo9/dist/index.html">
+                            <a class="menu-link {{ request()->routeIs($role . '.criteria.index') ? 'active' : '' }}"
+                                href="{{ route($role . '.criteria.index') }}">
                                 <span class="menu-bullet">
-                                    <span class="bullet bullet-dot"></span>
+                                    <i class="ki-duotone ki-check-square fs-3">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
                                 </span>
-                                <span class="menu-title">Default</span>
+                                <span class="menu-title">Criteria</span>
                             </a>
                         </div>
+
                     </div>
                 </div>
             </div>

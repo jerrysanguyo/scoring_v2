@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="{{ asset('assets/plugins/global/plugins.bundle.css') }}" type="text/css">
     <link rel="stylesheet" href="{{ asset('assets/css/style.bundle.css') }}" type="text/css">
     <link rel="stylesheet" href="{{ asset('assets/css/header-bg.css') }}">
+    <link href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
 
     <style>
     [x-cloak] {
@@ -54,7 +56,7 @@
             <div class="wrapper d-flex flex-column flex-row-fluid" id="kt_wrapper">
                 @include('layouts.header')
                 <div class="content d-flex flex-column flex-column-fluid" id="kt_content">
-                    <div class="container-xxl" id="kt_content_container">
+                    <div class="p-10" id="kt_content_container">
                         @yield('content')
                     </div>
                 </div>
@@ -68,6 +70,9 @@
     <script src="{{ asset('assets/plugins/global/plugins.bundle.js') }}"></script>
     <script src="{{ asset('assets/js/scripts.bundle.js') }}"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
     @stack('modals')
     @stack('scripts')
     @include('components.loading')
