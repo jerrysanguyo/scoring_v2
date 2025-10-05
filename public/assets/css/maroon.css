@@ -1,0 +1,30 @@
+:root{
+  --tcu-maroon:#7a0026;
+  --tcu-maroon-600:#8a0a2f;
+  --tcu-maroon-50:#fdebee;
+}
+
+.text-maroon{color:var(--tcu-maroon)!important;}
+.badge-maroon{background-color:var(--tcu-maroon); color:#fff;}
+.badge-outline-maroon{background:#fff;color:var(--tcu-maroon);border:1px solid var(--tcu-maroon);}
+
+.card-top-maroon{
+  position:relative;
+  border:1px solid var(--bs-border-color);
+  border-radius: .625rem;
+}
+
+.card-top-maroon::before{
+  content:"";
+  position:absolute; inset:0 auto auto 0;
+  height:4px; width:100%;
+  background:var(--tcu-maroon);
+  border-top-left-radius:.625rem;
+  border-top-right-radius:.625rem;
+}
+
+.surface-maroon-50{background:var(--tcu-maroon-50);}
+
+.mr-1{margin-right:.25rem!important;}
+.mr-2{margin-right:.5rem!important;}
+.mb-1{margin-bottom:.25rem!important;}
