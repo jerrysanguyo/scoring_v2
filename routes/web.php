@@ -23,7 +23,9 @@ Route::middleware('auth')
     ->group(function() {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-        Route::resource('criteria', CriteriaController::class)->middleware('merge_cms:criterias,criteria'); // merge_cms:table_name,resource
+        // Route::resource('criteria', CriteriaController::class)->middleware('merge_cms:criterias,criteria'); // merge_cms:table_name,resource
+        Route::resource('criteria', CriteriaController::class)->parameters(['criteria' => 'criteria']);;
+        Route::get('criteria/{criteria}/show/json', [CriteriaController::class, 'showJson'])->name('criteria.show.json');
     });
 
     Route::middleware('role:admin')

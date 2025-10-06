@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Criteria extends Model
 {
-    protected $table = 'criterias';
+    protected $table = 'criterias';    
     protected $fillable = [
-        'title',
+        'name',
         'no_of_participants',
         'remarks'
     ];
@@ -16,5 +16,10 @@ class Criteria extends Model
     public static function getAllCriterias()
     {
         return self::all();
+    }
+
+    public function details()
+    {
+        return $this->hasMany(CriteriaDetail::class, 'criteria_id');
     }
 }

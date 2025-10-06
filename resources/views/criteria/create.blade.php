@@ -12,41 +12,43 @@
             </div>
 
             <div class="modal-body py-lg-10 px-lg-10">
-                <div class="stepper stepper-pills stepper-column d-flex flex-column flex-xl-row flex-row-fluid"
-                    id="kt_stepper_criteria">
-                    <div class="d-flex justify-content-center flex-row-auto w-100 w-xl-300px">
-                        <div class="stepper-nav ps-lg-10">
-                            <div class="stepper-item current" data-kt-stepper-element="nav">
-                                <div class="stepper-wrapper">
-                                    <div class="stepper-icon w-40px h-40px">
-                                        <i class="ki-duotone ki-check stepper-check fs-2"></i>
-                                        <span class="stepper-number">1</span>
+                <form class="form" id="kt_stepper_criteria_form"
+                    action="{{ route(Auth::user()->getRoleNames()->first() . '.criteria.store') }}" method="POST">
+                    @csrf
+                    <div class="stepper stepper-pills stepper-column d-flex flex-column flex-xl-row flex-row-fluid"
+                        id="kt_stepper_criteria">
+                        <div class="d-flex justify-content-center flex-row-auto w-100 w-xl-300px">
+                            <div class="stepper-nav ps-lg-10">
+                                <div class="stepper-item current" data-kt-stepper-element="nav">
+                                    <div class="stepper-wrapper">
+                                        <div class="stepper-icon w-40px h-40px">
+                                            <i class="ki-duotone ki-check stepper-check fs-2"></i>
+                                            <span class="stepper-number">1</span>
+                                        </div>
+                                        <div class="stepper-label">
+                                            <h3 class="stepper-title">Criteria's title</h3>
+                                            <div class="stepper-desc">Title of criteria & number of participants</div>
+                                        </div>
                                     </div>
-                                    <div class="stepper-label">
-                                        <h3 class="stepper-title">Criteria's title</h3>
-                                        <div class="stepper-desc">Title of criteria & number of participants</div>
-                                    </div>
+                                    <div class="stepper-line h-40px"></div>
                                 </div>
-                                <div class="stepper-line h-40px"></div>
-                            </div>
 
-                            <div class="stepper-item" data-kt-stepper-element="nav">
-                                <div class="stepper-wrapper">
-                                    <div class="stepper-icon w-40px h-40px">
-                                        <i class="ki-duotone ki-check stepper-check fs-2"></i>
-                                        <span class="stepper-number">2</span>
-                                    </div>
-                                    <div class="stepper-label">
-                                        <h3 class="stepper-title">Criteria's Details</h3>
-                                        <div class="stepper-desc">Name of criteria & percentage</div>
+                                <div class="stepper-item" data-kt-stepper-element="nav">
+                                    <div class="stepper-wrapper">
+                                        <div class="stepper-icon w-40px h-40px">
+                                            <i class="ki-duotone ki-check stepper-check fs-2"></i>
+                                            <span class="stepper-number">2</span>
+                                        </div>
+                                        <div class="stepper-label">
+                                            <h3 class="stepper-title">Criteria's Details</h3>
+                                            <div class="stepper-desc">Name of criteria & percentage</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="flex-row-fluid py-lg-5 px-lg-15">
-                        <form class="form" id="kt_stepper_criteria_form">
+                        <div class="flex-row-fluid py-lg-5 px-lg-15">
                             <div class="current" data-kt-stepper-element="content">
                                 <div class="w-100">
                                     <div class="fv-row mb-10">
@@ -65,7 +67,7 @@
                             <div data-kt-stepper-element="content">
                                 <div class="w-100">
                                     <div id="criteria-repeater">
-                                        <!-- Repeater row template (will be cloned) -->
+
                                         <template id="criteria-row-template">
                                             <div class="criteria-row d-flex align-items-center gap-3 mb-4">
                                                 <div class="flex-grow-1">
@@ -94,7 +96,6 @@
                                             </div>
                                         </template>
 
-                                        <!-- initial row (visible) -->
                                         <div class="criteria-row d-flex align-items-center gap-3 mb-4">
                                             <div class="flex-grow-1">
                                                 <label class="form-label fs-6 fw-semibold mb-2">Name</label>
@@ -121,7 +122,6 @@
                                             </div>
                                         </div>
 
-                                        <!-- add button -->
                                         <div class="d-flex">
                                             <button type="button" id="add-criteria-row" class="btn btn-sm btn-primary">
                                                 <i class="ki-duotone ki-plus fs-3 me-1"><span class="path1"></span><span
@@ -154,9 +154,9 @@
                                     </button>
                                 </div>
                             </div>
-                        </form>
+                        </div>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
     </div>
@@ -167,37 +167,35 @@
 document.addEventListener('DOMContentLoaded', function() {
     const stepperEl = document.querySelector('#kt_stepper_criteria');
     const stepper = new KTStepper(stepperEl);
+    const form = document.querySelector('#kt_stepper_criteria_form');
 
     stepper.on("kt.stepper.next", function(stepperObj) {
         if (stepperObj.getCurrentStepIndex() === 1) {
-            let title = document.querySelector('[name="criteria_title"]').value.trim();
-            let participants = document.querySelector('[name="participants"]').value.trim();
+            const title = form.querySelector('[name="criteria_title"]').value.trim();
+            const participants = form.querySelector('[name="participants"]').value.trim();
 
-            if (title === '' || participants === '') {
+            if (!title || !participants) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Missing Required Fields',
                     text: 'Please enter both the Criteria Title and number of Participants before continuing.',
-                    confirmButtonColor: '#3085d6'
                 });
-
-                stepperObj.goTo(stepperObj.getCurrentStepIndex());
                 return;
             }
         }
-
-        stepperObj.goNext();
+        stepper.goNext();
     });
 
-    stepper.on("kt.stepper.previous", () => stepper.goPrevious());
+    stepper.on("kt.stepper.previous", function() {
+        stepper.goPrevious();
+    });
 
     stepper.on("kt.stepper.submit", function(e) {
-        const percentages = document.querySelectorAll('input[name="percentage[]"]');
-        let total = 0;
+        e.preventDefault();
 
-        percentages.forEach(input => {
-            total += parseFloat(input.value) || 0;
-        });
+        const percentages = form.querySelectorAll('input[name="percentage[]"]');
+        let total = 0;
+        percentages.forEach(i => total += parseFloat(i.value) || 0);
 
         if (Math.round(total) !== 100) {
             Swal.fire({
@@ -208,7 +206,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        document.querySelector('#kt_stepper_criteria_form').submit();
+        form.submit();
     });
 });
 </script>
@@ -287,7 +285,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (input.name === 'percentage[]') {
             if (input.value < 0) input.value = 0;
             if (input.value > 100) input.value = 100;
-            updateSubmitButtonVisibility(); // 👈 call here
+            updateSubmitButtonVisibility();
         }
     });
 });
