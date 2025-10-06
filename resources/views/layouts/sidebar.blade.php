@@ -24,6 +24,17 @@
                         </span>
                     </a>
                 </div>
+                <div class="menu-item py-2">
+                    <a href="{{ route(Auth::user()->getRoleNames()->first() . '.participant.index') }}"
+                        class="menu-link menu-center {{ request()->routeIs(Auth::user()->getRoleNames()->first() . '.participant.index') ? 'active' : '' }}">
+                        <span class="menu-icon me-0">
+                            <i class="ki-duotone ki-user fs-2x">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                            </i>
+                        </span>
+                    </a>
+                </div>
                 @php
                 $role = Auth::user()->getRoleNames()->first();
                 $children = [

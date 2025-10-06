@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Cms\CriteriaController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ParticipantController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -26,6 +27,7 @@ Route::middleware('auth')
         // Route::resource('criteria', CriteriaController::class)->middleware('merge_cms:criterias,criteria'); // merge_cms:table_name,resource
         Route::resource('criteria', CriteriaController::class)->parameters(['criteria' => 'criteria']);;
         Route::get('criteria/{criteria}/show/json', [CriteriaController::class, 'showJson'])->name('criteria.show.json');
+        Route::resource('participant', ParticipantController::class)->only(['index', 'store', 'update', 'destroy']);
     });
 
     Route::middleware('role:admin')
