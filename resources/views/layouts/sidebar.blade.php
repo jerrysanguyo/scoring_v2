@@ -24,16 +24,63 @@
                         </span>
                     </a>
                 </div>
-                <div class="menu-item py-2">
-                    <a href="{{ route(Auth::user()->getRoleNames()->first() . '.participant.index') }}"
-                        class="menu-link menu-center {{ request()->routeIs(Auth::user()->getRoleNames()->first() . '.participant.index') ? 'active' : '' }}">
+                @role('superadmin')
+
+
+                @php
+                $role = Auth::user()->getRoleNames()->first();
+                $person = [
+                'participant.index',
+                ];
+
+                $open = collect($person)
+                ->map(fn($r) => "$role.$r")
+                ->contains(fn($route) => request()->routeIs($route));
+                @endphp
+
+                <div data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-placement="right-start"
+                    class="menu-item py-2 {{ $open ? 'show here' : '' }}">
+
+                    <span class="menu-link menu-center {{ $open ? 'active' : '' }}">
                         <span class="menu-icon me-0">
                             <i class="ki-duotone ki-user fs-2x">
                                 <span class="path1"></span>
                                 <span class="path2"></span>
                             </i>
                         </span>
-                    </a>
+                    </span>
+
+                    <div class="menu-sub menu-sub-dropdown px-2 py-4 w-250px mh-75 overflow-auto">
+                        <div class="menu-item">
+                            <div class="menu-content">
+                                <span class="menu-section fs-5 fw-bolder ps-1 py-1">Users</span>
+                            </div>
+                        </div>
+
+                        <div class="menu-item">
+                            <a class="menu-link {{ request()->routeIs($role . '.participant.index') ? 'active' : '' }}"
+                                href="{{ route($role . '.participant.index') }}">
+                                <span class="menu-bullet">
+                                    <i class="ki-duotone ki-check-square fs-3">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                </span>
+                                <span class="menu-title">Participants</span>
+                            </a>
+                            <a class="menu-link {{ request()->routeIs($role . '.account.index') ? 'active' : '' }}"
+                                href="{{ route($role . '.account.index') }}">
+                                <span class="menu-bullet">
+                                    <i class="ki-duotone ki-check-square fs-3">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                </span>
+                                <span class="menu-title">Accounts</span>
+                            </a>
+                        </div>
+
+                    </div>
                 </div>
                 @php
                 $role = Auth::user()->getRoleNames()->first();
@@ -80,6 +127,7 @@
 
                     </div>
                 </div>
+                @endrole
             </div>
         </div>
     </div>

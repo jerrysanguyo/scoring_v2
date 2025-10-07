@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\AccountController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Cms\CriteriaController;
 use App\Http\Controllers\DashboardController;
@@ -33,6 +34,7 @@ Route::middleware('auth')
         
         Route::post('/criteria/{criteria}/lock',   [CriteriaController::class, 'lock'])->name('criteria.lock');
         Route::post('/criteria/{criteria}/unlock', [CriteriaController::class, 'unlock'])->name('criteria.unlock');
+        Route::resource('/account', AccountController::class);
     });
 
     Route::middleware('role:admin')

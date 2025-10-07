@@ -12,7 +12,6 @@
             </div>
 
             <div class="modal-body py-7 px-8">
-                {{-- ✅ These fields fix your error --}}
                 <div class="mb-5">
                     <div class="fw-semibold">Participant:</div>
                     <div id="scoreParticipantName" class="text-gray-700"></div>
@@ -35,7 +34,7 @@
                                 </tr>
                             </thead>
                             <tbody id="scoreRows">
-                                <!-- JS inserts rows here -->
+
                             </tbody>
                             <tfoot>
                                 <tr class="bg-light-subtle">

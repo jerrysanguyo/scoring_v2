@@ -28,21 +28,57 @@
                 <tbody>
                     @foreach ($data as $record)
                     <tr>
+                        @if ($resource === 'participant')
                         <td class="align-middle">{{ $record->id }}</td>
                         <td class="align-middle">{{ $record->name }}</td>
+                        @endif
+                        @if ($resource === 'account')
+                        <td class="align-middle">{{ $record->id }}</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <span>{{ trim($record->first_name.' '.($record->middle_name ?? '').' '.$record->last_name) }}</span>
+
+                                @if ($record->role_name === 'superadmin')
+                                <span class="badge bg-danger fw-semibold">{{ ucfirst($record->role_name) }}</span>
+                                @elseif ($record->role_name === 'admin')
+                                <span class="badge bg-primary fw-semibold">{{ ucfirst($record->role_name) }}</span>
+                                @else
+                                <span class="badge bg-secondary fw-semibold">{{ ucfirst($record->role_name) }}</span>
+                                @endif
+                            </div>
+                        </td>
+                        @endif
                         <td class="align-middle">
                             <div class="btn-group" role="group">
-                                <button type="button" class="btn btn-sm btn-primary js-edit-criteria"
+                                @if ($resource === 'participant')
+                                <button type="button" class="btn btn-sm btn-primary js-edit-participant"
                                     data-bs-toggle="modal" data-bs-target="#edit{{ $resource }}Modal"
                                     data-update="{{ route(Auth::user()->getRoleNames()->first() . '.' . $resource . '.update', $record) }}"
                                     data-name="{{ $record->name }}">
                                     <i class="ki-duotone ki-pencil fs-4 me-1"></i>Edit
                                 </button>
-                                
+                                @endif
+
+                                @if ($resource === 'account')
+                                <button type="button" class="btn btn-sm btn-primary js-edit-account"
+                                    data-bs-toggle="modal" data-bs-target="#edit{{ $resource }}Modal"
+                                    data-update="{{ route(Auth::user()->getRoleNames()->first() . '.' . $resource . '.update', $record) }}"
+                                    data-first_name="{{ $record->first_name }}"
+                                    data-middle_name="{{ $record->middle_name }}"
+                                    data-last_name="{{ $record->last_name }}" data-email="{{ $record->email }}"
+                                    data-contact_number="{{ $record->contact_number }}"
+                                    data-role="{{ $record->role_name }}"
+                                    data-label="{{ trim($record->first_name.' '.($record->middle_name ?? '').' '.$record->last_name) }}">
+                                    <i class=" ki-duotone ki-pencil fs-4 me-1"></i>Edit
+                                </button>
+                                @endif
+
                                 <button type="button" class="btn btn-sm btn-danger js-open-delete"
                                     data-bs-toggle="modal" data-bs-target="#delete{{ $resource }}Modal"
                                     data-delete="{{ route(Auth::user()->getRoleNames()->first() . '.' . $resource . '.destroy', $record) }}"
-                                    data-name="{{ $record->name }}" title="Delete {{ $record->name }}">
+                                    @if ($resource==='participant' ) data-name="{{ $record->name }}"
+                                    title="Delete {{ $record->name }}" @else data-name="{{ trim($record->first_name.' '.($record->middle_name ?? '').' '.$record->last_name) }}"
+                                    title="Delete {{ trim($record->first_name.' '.($record->middle_name ?? '').' '.$record->last_name) }}" @endif>
                                     <i class="ki-duotone ki-trash fs-3"></i>Delete
                                 </button>
                             </div>
@@ -108,16 +144,35 @@ $(document).ready(function() {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
-    $(document).on('click', '.js-edit-criteria', function() {
+    $(document).on('click', '.js-edit-participant', function() {
         const $btn = $(this);
         const action = $btn.data('update') || '';
         const name = $btn.data('name') || '';
 
-        const $form = $('#edit{{ $resource }}Form');
+        const $form = $('#editparticipantForm');
         $form.attr('action', action);
 
-        $('#edit-{{ $resource }}-name').val(name);
-        $('#edit-{{ $resource }}-label').text(name);
+        $('#edit-participant-name').val(name);
+        $('#edit-participant-label').text(name);
+    });
+
+    $(document).on('click', '.js-edit-account', function() {
+        const $btn = $(this);
+        const action = $btn.data('update') || '';
+        const label = $btn.data('label') || '';
+
+        const $form = $('#editaccountForm');
+        $form.attr('action', action);
+
+        $('#edit-account-first_name').val($btn.data('first_name') || '');
+        $('#edit-account-middle_name').val($btn.data('middle_name') || '');
+        $('#edit-account-last_name').val($btn.data('last_name') || '');
+        $('#edit-account-email').val($btn.data('email') || '');
+        $('#edit-account-contact_number').val($btn.data('contact_number') || '');
+        $('#edit-account-password').val('');
+        $('#edit-account-role').val(($btn.data('role') || '').toLowerCase());
+
+        $('#edit-account-label').text(label);
     });
 
     $(document).on('click', '.js-open-delete', function() {
@@ -127,7 +182,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const $form = $('#delete{{ $resource }}Form');
         $form.attr('action', action);
-
         $('#delete-{{ $resource }}-name').text(name);
     });
 });

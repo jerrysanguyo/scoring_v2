@@ -10,10 +10,7 @@ use Illuminate\Http\Request;
 
 class ParticipantController extends Controller
 {
-    public function __construct(private ParticipantServices $service)
-    {
-        // add middleware/permissions here if needed
-    }
+    public function __construct(private ParticipantServices $service) {}
 
     public function index(CmsDataTable $dataTable)
     {

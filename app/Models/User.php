@@ -13,7 +13,9 @@ class User extends Authenticatable
     use HasFactory, Notifiable, HasRoles;
     
     protected $fillable = [
-        'name',
+        'first_name',
+        'middle_name',
+        'last_name',
         'email',
         'password',
     ];
@@ -29,6 +31,17 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public static function getAllUsers()
+    {
+        return self::select('id', 'first_name', 'middle_name', 'last_name', 'email', 'contact_number')
+            ->with('roles:id,name')
+            ->get()
+            ->map(function ($user) {
+                $user->role_name = $user->roles->pluck('name')->first();
+                return $user;
+            });
     }
 
     public function score()

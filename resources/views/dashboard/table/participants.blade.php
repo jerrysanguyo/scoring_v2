@@ -52,7 +52,7 @@
                 @endphp
                 <td class="text-center">
                     @if(!is_null($val))
-                    <span class="badge bg-info text-dark">{{ number_format($val, 2) }}</span>
+                    <span class="badge bg-info text-white">{{ number_format($val, 2) }}</span>
                     @else
                     <span class="text-muted">—</span>
                     @endif
