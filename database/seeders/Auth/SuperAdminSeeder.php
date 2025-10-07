@@ -27,5 +27,25 @@ class SuperAdminSeeder extends Seeder
         if (!$user->hasRole('superadmin')) {
             $user->assignRole('superadmin');
         }
+
+        for ($i = 1; $i <= 5; $i++) {
+            $email = "judge{$i}@gmail.com";
+
+            $user = User::firstOrCreate(
+                ['email' => $email],
+                [
+                    'uuid'           => (string) Str::uuid(),
+                    'first_name'     => 'Judge',
+                    'middle_name'    => 'No',
+                    'last_name'      => (string) $i,
+                    'contact_number' => '09' . rand(100000000, 999999999),
+                    'password'       => Hash::make('password'),
+                ]
+            );
+
+            if (!$user->hasRole('admin')) {
+                $user->assignRole('admin');
+            }
+        }
     }
 }

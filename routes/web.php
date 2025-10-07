@@ -43,6 +43,8 @@ Route::middleware('auth')
     ->group(function() {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+        Route::post('/scores', [DashboardController::class, 'store'])->name('scores.store');
+        Route::get('/scores/{participant}/{criteria}', [DashboardController::class, 'showForCriteria'])->name('scores.showForCriteria');
     });
 
     Route::middleware('role:user')
