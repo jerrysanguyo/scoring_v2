@@ -28,6 +28,11 @@ Route::middleware('auth')
         Route::resource('criteria', CriteriaController::class)->parameters(['criteria' => 'criteria']);;
         Route::get('criteria/{criteria}/show/json', [CriteriaController::class, 'showJson'])->name('criteria.show.json');
         Route::resource('participant', ParticipantController::class)->only(['index', 'store', 'update', 'destroy']);
+        Route::post('/scores', [DashboardController::class, 'store'])->name('scores.store');
+        Route::get('/scores/{participant}/{criteria}', [DashboardController::class, 'showForCriteria'])->name('scores.showForCriteria');
+        
+        Route::post('/criteria/{criteria}/lock',   [CriteriaController::class, 'lock'])->name('criteria.lock');
+        Route::post('/criteria/{criteria}/unlock', [CriteriaController::class, 'unlock'])->name('criteria.unlock');
     });
 
     Route::middleware('role:admin')

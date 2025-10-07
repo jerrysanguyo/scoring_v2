@@ -35,6 +35,10 @@
             <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}" id="criteria-{{ $criteria->id }}"
                 role="tabpanel" aria-labelledby="tab-{{ $criteria->id }}">
 
+                @php
+                $isLocked = strtolower(trim((string) $criteria->remarks)) === 'lock';
+                @endphp
+
                 <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4">
                     <div class="mb-2 mb-md-0">
                         <div class="fw-bold fs-5 text-gray-800">{{ $criteria->name }}</div>
@@ -43,74 +47,26 @@
                             @if(!empty($criteria->remarks))
                             • Remarks: <span class="fw-normal">{{ $criteria->remarks }}</span>
                             @endif
+                            @php $isLocked = (bool) $criteria->is_locked; @endphp
+                            @if($isLocked)
+                            • <span class="badge bg-danger">Locked</span>
+                            @endif
                         </div>
                     </div>
+
+                    @role('superadmin')
+                    <div>
+                        <button type="button" class="btn btn-sm {{ $isLocked ? 'btn-success' : 'btn-danger' }}"
+                            data-bs-toggle="modal" data-bs-target="#lockCriteriaModal-{{ $criteria->id }}">
+                            <i class="ki-duotone {{ $isLocked ? 'ki-unlock' : 'ki-lock' }} fs-5 me-1"></i>
+                            {{ $isLocked ? 'Unlock' : 'Lock' }}
+                        </button>
+                        @include('dashboard.modal.lock')
+                    </div>
+                    @endrole
                 </div>
 
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle gs-0 gy-3 table-rounded kt-table">
-                        <thead>
-                            <tr class="bg-light kt-thead">
-                                <th class="ps-4 w-50px">#</th>
-                                <th class="text-gray-700 text-uppercase fw-bold fs-7">Participant</th>
-
-                                @foreach($criteria->details as $detail)
-                                <th class="text-center text-gray-700 text-uppercase fw-bold fs-7">
-                                    {{ $detail->criteria_name }}
-                                    <div class="d-block text-muted small">{{ $detail->percentage }}%</div>
-                                </th>
-                                @endforeach
-
-                                <th class="text-end text-gray-700 text-uppercase fw-bold fs-7 pe-3">Action</th>
-                            </tr>
-                        </thead>
-
-                        @php
-                        $limit = (int) ($criteria->no_of_participants ?? 0);
-                        if (method_exists($participants, 'take')) {
-                        $participantsLimited = $limit > 0 ? $participants->take($limit) : $participants;
-                        $totalParticipants = method_exists($participants, 'count') ? $participants->count() :
-                        (is_array($participants) ? count($participants) : 0);
-                        $showingCount = method_exists($participantsLimited, 'count') ? $participantsLimited->count() :
-                        (is_array($participantsLimited) ? count($participantsLimited) : 0);
-                        } else {
-                        $participantsLimited = $limit > 0 ? array_slice($participants, 0, $limit) : $participants;
-                        $totalParticipants = is_array($participants) ? count($participants) : 0;
-                        $showingCount = is_array($participantsLimited) ? count($participantsLimited) : 0;
-                        }
-                        @endphp
-                        <tbody>
-                            @forelse($participantsLimited as $p)
-                            <tr class="kt-row">
-                                <td class="ps-4">
-                                    <div class="symbol symbol-25px symbol-circle bg-light-primary">
-                                        <span class="symbol-label fw-bold text-primary">{{ $loop->iteration }}</span>
-                                    </div>
-                                </td>
-
-                                <td class="fw-semibold text-gray-800">{{ $p->name }}</td>
-
-                                @foreach($criteria->details as $detail)
-                                <td class="text-center text-muted">—</td>
-                                @endforeach
-
-                                <td class="pe-3 text-end">
-                                    <button type="button" class="btn btn-sm btn-primary js-open-score"
-                                        data-participant-id="{{ $p->id }}" data-participant-name="{{ $p->name }}">
-                                        <i class="ki-duotone ki-pencil fs-5 me-1"></i> Score
-                                    </button>
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="{{ 3 + $criteria->details->count() }}" class="text-center text-muted py-6">
-                                    No participants found.
-                                </td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
+                @include('dashboard.table.participants')
 
             </div>
             @endforeach
@@ -153,16 +109,25 @@ window.CRITERIA_DETAILS = @json($criteriaConfig);
     function getActiveCriteriaId() {
         const activeBtn = document.querySelector('#criteriaTabs .nav-link.active');
         if (!activeBtn) return null;
-        const target = activeBtn.getAttribute('data-bs-target');
-        if (!target) return null;
-        const m = target.match(/^#criteria-(\d+)$/);
+        const m = activeBtn.getAttribute('data-bs-target')?.match(/^#criteria-(\d+)$/);
         return m ? parseInt(m[1], 10) : null;
     }
 
+    function recalcModalTotal() {
+        let sum = 0;
+        document.querySelectorAll('#scoreRows .score-input-modal').forEach(inp => {
+            const v = parseFloat(inp.value);
+            if (Number.isFinite(v)) sum += v;
+        });
+        const el = document.getElementById('scoreWeightedTotal');
+        if (el) el.textContent = sum.toFixed(2);
+    }
+
     function renderScoreRows(criteriaId) {
-        const cfg = window.CRITERIA_DETAILS?. [criteriaId]; // <-- NO space after ?.
+        const cfg = window.CRITERIA_DETAILS?. [criteriaId];
         const tbody = document.getElementById('scoreRows');
         if (!tbody) return;
+
         tbody.innerHTML = '';
         if (!cfg) return;
 
@@ -170,44 +135,26 @@ window.CRITERIA_DETAILS = @json($criteriaConfig);
             const tr = document.createElement('tr');
             tr.className = 'kt-row';
             tr.innerHTML = `
-          <td class="ps-4">
-            <div class="symbol symbol-25px symbol-circle bg-light-primary">
-              <span class="symbol-label fw-bold text-primary">${d.idx}</span>
-            </div>
-          </td>
-          <td class="fw-semibold text-gray-800">${d.name}</td>
-          <td class="text-center text-muted">${d.percentage}%</td>
-          <td class="pe-4 text-end">
-            <input type="number"
-                   class="form-control form-control-sm text-end score-input-modal"
-                   name="scores[${criteriaId}][DETAIL][${d.id}]"
-                   min="0" max="100" step="0.01" placeholder="0"
-                   data-weight="${d.percentage}">
-          </td>
-        `;
+        <td class="ps-4">
+          <div class="symbol symbol-25px symbol-circle bg-light-primary">
+            <span class="symbol-label fw-bold text-primary">${d.idx}</span>
+          </div>
+        </td>
+        <td class="fw-semibold text-gray-800">${d.name}</td>
+        <td class="text-center text-muted">${d.percentage}%</td>
+        <td class="pe-4 text-end">
+          <input type="number"
+                 class="form-control form-control-sm text-end score-input-modal"
+                 name="scores[${criteriaId}][DETAIL][${d.id}]"
+                 min="0" max="${d.percentage}" step="0.01" placeholder="0"
+                 data-weight="${d.percentage}">
+        </td>
+      `;
             tbody.appendChild(tr);
         });
 
-        const totalEl = document.getElementById('scoreWeightedTotal');
-        if (totalEl) totalEl.textContent = '0.00';
+        recalcModalTotal();
     }
-
-    function recalcModalTotal() {
-        let weighted = 0;
-        document.querySelectorAll('#scoreRows .score-input-modal').forEach(inp => {
-            const v = parseFloat(inp.value || '0');
-            const w = parseFloat(inp.dataset.weight || '0');
-            weighted += (v / 100) * w;
-        });
-        const totalEl = document.getElementById('scoreWeightedTotal');
-        if (totalEl) totalEl.textContent = weighted.toFixed(2);
-    }
-
-    document.addEventListener('input', (e) => {
-        if (e.target && e.target.classList.contains('score-input-modal')) {
-            recalcModalTotal();
-        }
-    });
 
     document.addEventListener('click', (e) => {
         const btn = e.target.closest('.js-open-score');
@@ -229,7 +176,96 @@ window.CRITERIA_DETAILS = @json($criteriaConfig);
 
         const modal = new bootstrap.Modal(document.getElementById('scoreModal'));
         modal.show();
+
+        const prefillTemplate =
+            `{{ route(Auth::user()->getRoleNames()->first() . '.scores.showForCriteria', ['participant' => '__PID__', 'criteria' => '__CID__']) }}`;
+        const prefillUrl = prefillTemplate.replace('__PID__', pid).replace('__CID__', criteriaId);
+
+        fetch(prefillUrl, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(r => r.ok ? r.json() : Promise.reject())
+            .then(({
+                scores
+            }) => {
+                document.querySelectorAll('#scoreRows .score-input-modal').forEach(inp => {
+                    const m = inp.name.match(/\[DETAIL]\[(\d+)\]$/);
+                    const detailId = m ? m[1] : null;
+                    if (detailId && scores && scores[detailId] !== undefined) {
+                        inp.value = scores[detailId];
+                    }
+                });
+                recalcModalTotal();
+            })
+            .catch(() => {
+
+            });
+    });
+
+    document.addEventListener('input', function(e) {
+        if (!e.target.classList.contains('score-input-modal')) return;
+        const max = parseFloat(e.target.max);
+        let val = parseFloat(e.target.value);
+        if (!Number.isFinite(val)) val = 0;
+        if (Number.isFinite(max)) {
+            if (val > max) val = max;
+            if (val < 0) val = 0;
+        }
+        e.target.value = (Math.round(val * 100) / 100).toString();
+        recalcModalTotal();
     });
 })();
+
+(function() {
+    const form = document.getElementById('scoreForm');
+
+    form?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const res = await fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: new FormData(form)
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+            alert(data.message || 'Failed to save scores.');
+            return;
+        }
+
+        bootstrap.Modal.getInstance(document.getElementById('scoreModal'))?.hide();
+
+        const cid = document.getElementById('scoreCriteriaId')?.value;
+        sessionStorage.setItem('activeCriteriaTab', cid);
+        location.reload();
+    });
+})();
+
+document.addEventListener('DOMContentLoaded', () => {
+    const tabId = sessionStorage.getItem('activeCriteriaTab');
+    if (!tabId) return;
+
+    const btn = document.querySelector(`#criteriaTabs [data-bs-target="#criteria-${tabId}"]`);
+    if (!btn) return;
+
+    new bootstrap.Tab(btn).show();
+    sessionStorage.removeItem('activeCriteriaTab');
+});
+
+document.addEventListener('input', function(e) {
+    if (e.target.matches('.score-input-modal')) {
+        const max = parseFloat(e.target.max);
+        const val = parseFloat(e.target.value);
+        if (val > max) {
+            e.target.value = max;
+        } else if (val < 0) {
+            e.target.value = 0;
+        }
+    }
+});
 </script>
 @endpush

@@ -12,6 +12,9 @@ class Criteria extends Model
         'no_of_participants',
         'remarks'
     ];
+    protected $casts = [
+        'locked_at' => 'datetime',
+    ];
 
     public static function getAllCriterias()
     {
@@ -21,5 +24,10 @@ class Criteria extends Model
     public function details()
     {
         return $this->hasMany(CriteriaDetail::class, 'criteria_id');
+    }
+
+    public function getIsLockedAttribute(): bool
+    {
+        return !is_null($this->locked_at);
     }
 }

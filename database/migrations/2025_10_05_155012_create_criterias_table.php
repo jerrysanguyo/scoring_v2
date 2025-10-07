@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->integer('no_of_participants');
-            $table->string('remarks')->nullable();
+            $table->string('remarks')->nullable()->default('unlock');
+            $table->timestamp('locked_at')->nullable();
             $table->timestamps();
         });
     }

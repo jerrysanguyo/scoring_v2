@@ -95,4 +95,28 @@ class CriteriaController extends Controller
             'update_url'         => route(auth()->user()->getRoleNames()->first().'.criteria.update', $criteria),
         ]);
     }
+
+        public function lock(Criteria $criteria)
+    {
+        if ($criteria->locked_at) {
+            return back()->with('info', 'Criteria is already locked.');
+        }
+
+        $criteria->locked_at = now();
+        $criteria->save();
+
+        return back()->with('success', 'Criteria locked.');
+    }
+
+    public function unlock(Criteria $criteria)
+    {
+        if (!$criteria->locked_at) {
+            return back()->with('info', 'Criteria is already unlocked.');
+        }
+
+        $criteria->locked_at = null;
+        $criteria->save();
+
+        return back()->with('success', 'Criteria unlocked.');
+    }
 }

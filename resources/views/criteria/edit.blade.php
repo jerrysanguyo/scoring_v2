@@ -9,7 +9,7 @@
             </div>
 
             <div class="modal-body py-lg-10 px-lg-10">
-                <form class="form" id="kt_stepper_criteria_form_edit" action="{{ route(Auth::user()->getRoleNames()->first() . '.criteria.update', $record->id) }}" method="POST">
+                <form class="form" id="kt_stepper_criteria_form_edit" action="" method="POST">
                     @csrf
                     @method('PUT')
 

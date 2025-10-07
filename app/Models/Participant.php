@@ -15,4 +15,9 @@ class Participant extends Model
     {
         return static::query()->select('id', 'name')->latest()->get();
     }
+
+    public function score()
+    {
+        return $this->hasMany(Score::class, 'participant_id');
+    }
 }
