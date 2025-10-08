@@ -151,11 +151,6 @@
                     <a href="#" class="menu-link px-3">Update Account</a>
                 </div>
                 <div class="separator mt-3 opacity-75"></div>
-                <div class="menu-item px-3">
-                    <div class="menu-content px-3 py-3">
-                        <a class="btn btn-primary btn-sm px-4" href="#">Logout</a>
-                    </div>
-                </div>
             </div>
         </div>
     </div>

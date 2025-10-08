@@ -41,10 +41,13 @@
                                     <img alt="Logo" src="{{ asset('images/default.webp') }}" />
                                 </div>
                                 <div class="d-flex flex-column">
-                                    <div class="fw-bold text-black d-flex align-items-center fs-5">{{ Auth::user()->first_name . ' ' . Auth::user()->last_name }}
-                                        <span class="badge badge-light-success fw-bold fs-8 px-2 py-1 ms-2">{{ Auth::user()->getRoleNames()->first() }}</span>
+                                    <div class="fw-bold text-black d-flex align-items-center fs-5">
+                                        {{ Auth::user()->first_name . ' ' . Auth::user()->last_name }}
+                                        <span
+                                            class="badge badge-light-success fw-bold fs-8 px-2 py-1 ms-2">{{ Auth::user()->getRoleNames()->first() }}</span>
                                     </div>
-                                    <a href="#" class="fw-semibold text-muted text-hover-primary fs-7">{{ Auth::user()->email }}</a>
+                                    <a href="#"
+                                        class="fw-semibold text-muted text-hover-primary fs-7">{{ Auth::user()->email }}</a>
                                 </div>
                             </div>
                         </div>
@@ -58,8 +61,16 @@
                                 Settings</a>
                         </div>
                         <div class="menu-item px-5">
-                            <a href="#"
-                                class="menu-link px-5">Sign Out</a>
+                            <form id="logout-form"
+                                action="{{ route(Auth::user()->getRoleNames()->first() . '.logout') }}" method="POST"
+                                class="d-none">
+                                @csrf
+                            </form>
+
+                            <a href="#" class="menu-link px-5"
+                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                Sign Out
+                            </a>
                         </div>
                     </div>
                 </div>
